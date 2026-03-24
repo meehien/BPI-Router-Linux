@@ -1185,6 +1185,926 @@ struct mxl862xx_ctp_port_assignment {
 } __packed;
 
 /**
+ * enum mxl862xx_port_duplex - Ethernet port duplex status
+ * @MXL862XX_DUPLEX_FULL: Port operates in full-duplex mode
+ * @MXL862XX_DUPLEX_HALF: Port operates in half-duplex mode
+ * @MXL862XX_DUPLEX_AUTO: Port operates in Auto mode
+ */
+enum mxl862xx_port_duplex {
+	MXL862XX_DUPLEX_FULL = 0,
+	MXL862XX_DUPLEX_HALF,
+	MXL862XX_DUPLEX_AUTO,
+};
+
+/**
+ * enum mxl862xx_port_type - Port Type
+ * @MXL862XX_LOGICAL_PORT: Logical Port
+ * @MXL862XX_PHYSICAL_PORT: Physical Port
+ * @MXL862XX_CTP_PORT: Connectivity Termination Port (CTP)
+ * @MXL862XX_BRIDGE_PORT: Bridge Port
+ */
+enum mxl862xx_port_type {
+	MXL862XX_LOGICAL_PORT = 0,
+	MXL862XX_PHYSICAL_PORT,
+	MXL862XX_CTP_PORT,
+	MXL862XX_BRIDGE_PORT,
+};
+
+/**
+ * enum mxl862xx_port_enable - port enable type selection.
+ * @MXL862XX_PORT_DISABLE: the port is disabled in both directions
+ * @MXL862XX_PORT_ENABLE_RXTX: the port is enabled in both directions
+ * @MXL862XX_PORT_ENABLE_RX: the port is enabled in the receive direction
+ * @MXL862XX_PORT_ENABLE_TX: the port is enabled in the transmit direction
+ */
+enum mxl862xx_port_enable{
+	MXL862XX_PORT_DISABLE = 0,
+	MXL862XX_PORT_ENABLE_RXTX,
+	MXL862XX_PORT_ENABLE_RX,
+	MXL862XX_PORT_ENABLE_TX,
+};
+
+/**
+ * enum mxl862xx_port_flow - ethernet flow control status
+ * @MXL862XX_FLOW_AUTO: automatic flow control
+ * @MXL862XX_FLOW_RX: receive flow control only
+ * @MXL862XX_FLOW_TX: transmit flow control only
+ * @MXL862XX_FLOW_RXTX: receive and transmit flow control
+ * @MXL862XX_FLOW_OFF: no flow control
+ */
+enum mxl862xx_port_flow {
+	MXL862XX_FLOW_AUTO = 0,
+	MXL862XX_FLOW_RX,
+	MXL862XX_FLOW_TX,
+	MXL862XX_FLOW_RXTX,
+	MXL862XX_FLOW_OFF,
+};
+
+/**
+ * enum mxl862xx_port_monitor - port mirror options
+ * @MXL862XX_PORT_MONITOR_NONE: mirroring is disabled
+ * @MXL862XX_PORT_MONITOR_RX: ingress packets are mirrored
+ * @MXL862XX_PORT_MONITOR_TX: egress packets are mirrored
+ * @MXL862XX_PORT_MONITOR_RXTX: ingress and egress packets are mirrored
+ * @MXL862XX_PORT_MONITOR_VLAN_UNKNOWN: mirroring of 'unknown VLAN violation' frames
+ * @MXL862XX_PORT_MONITOR_VLAN_MEMBERSHIP: mirroring of 'VLAN ingress or egress membership
+	violation' frames
+ * @MXL862XX_PORT_MONITOR_PORT_STATE: mirroring of 'port state violation' frames
+ * @MXL862XX_PORT_MONITOR_LEARNING_LIMIT: mirroring of 'MAC learning limit violation' frames
+ * @MXL862XX_PORT_MONITOR_PORT_LOCK: mirroring of 'port lock violation' frames
+ */
+enum mxl862xx_port_monitor {
+	MXL862XX_PORT_MONITOR_NONE = 0,
+	MXL862XX_PORT_MONITOR_RX,
+	MXL862XX_PORT_MONITOR_TX,
+	MXL862XX_PORT_MONITOR_RXTX,
+	MXL862XX_PORT_MONITOR_VLAN_UNKNOWN,
+	MXL862XX_PORT_MONITOR_VLAN_MEMBERSHIP = 16,
+	MXL862XX_PORT_MONITOR_PORT_STATE = 32,
+	MXL862XX_PORT_MONITOR_LEARNING_LIMIT = 64,
+	MXL862XX_PORT_MONITOR_PORT_LOCK = 128,
+};
+
+/**
+ * enum mxl862xx_if_rmon_mode - interface RMON counter mode
+ * @MXL862XX_IF_RMON_FID: FID based RMON counters
+ * @MXL862XX_IF_RMON_SUBID: sub-interface ID based
+ * @MXL862XX_IF_RMON_FLOWID_LSB: flow ID based (bits 3:0)
+ * @MXL862XX_IF_RMON_FLOWID_MSB: flow ID based (bits 7:4)
+ */
+enum mxl862xx_if_rmon_mode {
+	MXL862XX_IF_RMON_FID = 0,
+	MXL862XX_IF_RMON_SUBID,
+	MXL862XX_IF_RMON_FLOWID_LSB,
+	MXL862XX_IF_RMON_FLOWID_MSB,
+};
+
+/**
+ * struct mxl862xx_port_cfg - Port Configuration Parameters
+ * @port_type: See &enum mxl862xx_port_type
+ * @port_id: Ethernet Port number (zero-based counting)
+ * @enable: See &enum mxl862xx_port_enable
+ * @unicast_unknown_drop: Drop unknown unicast packets
+ * @multicast_unknown_drop: Drop unknown multicast packets
+ * @reserved_packet_drop: Drop reserved packet types
+ * @broadcast_drop: Drop broadcast packets
+ * @aging: Enables MAC address table aging.
+ * @learning: MAC address table learning
+ * @learning_mac_port_lock: Automatic MAC address table learning locking on the port
+ * @learning_limit: Automatic MAC address table learning limitation on this port
+ * @mac_spoofing_detection: MAC spoofing detection. Identifies ingress packets that carry
+ *      a MAC source address which was previously learned on a different ingress port
+ * @flow_ctrl: See &enum mxl862xx_port_flow
+ * @port_monitor: See &enum mxl862xx_port_monitor
+ * @if_counters: Assign Interface RMON Counters for this Port
+ * @if_count_start_idx: Interface RMON Counters Start Index
+ * @if_rmonmode: See &enum mxl862xx_if_rmon_mode
+ */
+struct mxl862xx_port_cfg {
+	__le32 port_type; /* enum mxl862xx_port_type */
+	__le16 port_id;
+	__le32 enable; /* enum mxl862xx_port_enable */
+	u8 unicast_unknown_drop;
+	u8 multicast_unknown_drop;
+	u8 reserved_packet_drop;
+	u8 broadcast_drop;
+	u8 aging;
+	u8 learning;
+	u8 learning_mac_port_lock;
+	__le16 learning_limit;
+	u8 mac_spoofing_detection;
+	__le32 flow_ctrl; /* enum mxl862xx_port_flow */
+	__le32 port_monitor; /* enum mxl862xx_port_monitor */
+	u8 if_counters;
+	__le32 if_count_start_idx;
+	__le32 if_rmonmode; /* enum mxl862xx_if_rmon_mode */
+} __packed;
+
+/**
+ * enum mxl862xx_port_speed -  Ethernet port speed mode
+ * @MXL862XX_PORT_SPEED_10: 10 Mbit/s
+ * @MXL862XX_PORT_SPEED_100: 100 Mbit/s
+ * @MXL862XX_PORT_SPEED_200: 200 Mbit/s
+ * @MXL862XX_PORT_SPEED_1000: 1000 Mbit/s
+ * @MXL862XX_PORT_SPEED_2500: 2.5 Gbit/s
+ * @MXL862XX_PORT_SPEED_5000: 5 Gbit/s
+ * @MXL862XX_PORT_SPEED_10000: 10 Gbit/s
+ * @MXL862XX_PORT_SPEED_AUTO: Auto speed for XGMAC
+ */
+enum mxl862xx_port_speed {
+	MXL862XX_PORT_SPEED_10 = 0,
+	MXL862XX_PORT_SPEED_100,
+	MXL862XX_PORT_SPEED_200,
+	MXL862XX_PORT_SPEED_1000,
+	MXL862XX_PORT_SPEED_2500,
+	MXL862XX_PORT_SPEED_5000,
+	MXL862XX_PORT_SPEED_10000,
+	MXL862XX_PORT_SPEED_AUTO,
+};
+
+/**
+ * enum mxl862xx_port_link - Force the MAC and PHY link modus
+ * @MXL862XX_PORT_LINK_UP: Link up
+ * @MXL862XX_PORT_LINK_DOWN: Link down
+ * @MXL862XX_PORT_LINK_AUTO: Link Auto
+ */
+enum mxl862xx_port_link {
+	MXL862XX_PORT_LINK_UP = 0,
+	MXL862XX_PORT_LINK_DOWN,
+	MXL862XX_PORT_LINK_AUTO,
+};
+
+/**
+ * enum mxl862xx_mii_mode - Ethernet port interface mode
+ * @MXL862XX_PORT_HW_MII: Normal PHY interface
+ * @MXL862XX_PORT_HW_RMII: Reduced MII interface in normal mode
+ * @MXL862XX_PORT_HW_GMII: GMII or MII, depending upon the speed
+ * @MXL862XX_PORT_HW_RGMII: RGMII mode
+ * @MXL862XX_PORT_HW_XGMII: XGMII mode
+ */
+enum mxl862xx_mii_mode {
+	MXL862XX_PORT_HW_MII = 0,
+	MXL862XX_PORT_HW_RMII,
+	MXL862XX_PORT_HW_GMII,
+	MXL862XX_PORT_HW_RGMII,
+	MXL862XX_PORT_HW_XGMII,
+};
+
+/**
+ * enum mxl862xx_mii_type - Ethernet port configuration for PHY or MAC mode
+ * @MXL862XX_PORT_MAC: The Ethernet port is configured to work in MAC mode
+ * @MXL862XX_PORT_PHY: The Ethernet port is configured to work in PHY mode
+ */
+enum mxl862xx_mii_type {
+	MXL862XX_PORT_MAC = 0,
+	MXL862XX_PORT_PHY,
+};
+
+/**
+ * enum mxl862xx_clk_mode - Ethernet port clock source configuration
+ * @MXL862XX_PORT_CLK_NA: Clock Mode not applicable
+ * @MXL862XX_PORT_CLK_MASTER: Clock Master Mode. The port is configured to provide the clock as output signal
+ * @MXL862XX_PORT_CLK_SLAVE: Clock Slave Mode. The port is configured to use the input clock signal
+ */
+enum mxl862xx_clk_mode {
+	MXL862XX_PORT_CLK_NA = 0,
+	MXL862XX_PORT_CLK_MASTER,
+	MXL862XX_PORT_CLK_SLAVE,
+};
+
+/**
+ * struct mxl862xx_port_link_cfg - Ethernet port link, speed status and flow control status
+ * @port_id: Ethernet Port number
+ * @duplex_force: Force Port Duplex Mode
+ * @duplex: See &enum mxl862xx_port_duplex
+ * @speed_force: Force Link Speed
+ * @speed: See &enum mxl862xx_port_speed
+ * @link_force: Force Link
+ * @link: See &enum mxl862xx_port_link
+ * @mii_mode: See &enum mxl862xx_mii_mode
+ * @mii_type: See &enum mxl862xx_mii_type
+ * @clk_mode: See &enum mxl862xx_clk_mode
+ * @lpi: 'Low Power Idle' Support for 'Energy Efficient Ethernet'
+ */
+struct mxl862xx_port_link_cfg {
+	__le16 port_id;
+	u8 duplex_force;
+	__le32  duplex; /* enum mxl862xx_port_duplex */
+	u8 speed_force;
+	__le32 speed; /* enum mxl862xx_port_speed */
+	u8 link_force;
+	__le32 link; /* enum mxl862xx_port_link */
+	__le32 mii_mode; /* enum mxl862xx_mii_mode */
+	__le32 mii_type; /* enum mxl862xx_mii_type */
+	__le32 clk_mode; /* enum mxl862xx_clk_mode */
+	u8 lpi;
+} __packed;
+
+/* PCE (Packet Classification Engine) rule structures.
+ *
+ * Binary layout must exactly match the firmware's GSW_PCE_rule_t
+ * (gsw_flow.h, packed little-endian). The firmware deserializes
+ * the structure directly from the MDIO data buffer produced by
+ * mxl862xx_api_wrap().
+ */
+
+/**
+ * union mxl862xx_ip - IPv4 or IPv6 address
+ * @ipv4: IPv4 address in little-endian
+ * @ipv6: IPv6 address as array of little-endian 16-bit words
+ */
+union mxl862xx_ip {
+	__le32 ipv4;
+	__le16 ipv6[8];
+} __packed;
+
+/**
+ * struct mxl862xx_pce_pattern - PCE rule match pattern
+ *
+ * Every field must remain in the order shown; the firmware
+ * interprets the buffer positionally.
+ *
+ * @index: PCE rule index (0..511)
+ * @dst_ip_mask: Destination IP nibble mask (outer)
+ * @inner_dst_ip_mask: Inner destination IP nibble mask
+ * @src_ip_mask: Source IP nibble mask (outer)
+ * @inner_src_ip_mask: Inner source IP nibble mask
+ * @sub_if_id: Incoming sub-interface ID value
+ * @pkt_lng: Packet length in bytes
+ * @pkt_lng_range: Packet length range upper bound
+ * @mac_dst_mask: Destination MAC nibble mask
+ * @mac_src_mask: Source MAC nibble mask
+ * @app_data_msb: MSB application field (first 2 bytes after IP header,
+ *                typically TCP/UDP source port)
+ * @app_mask_range_msb: MSB application mask or range value
+ * @ether_type: EtherType value to match
+ * @ether_type_mask: EtherType nibble mask
+ * @session_id: PPPoE session ID
+ * @ppp_protocol: PPP protocol value
+ * @ppp_protocol_mask: PPP protocol bit mask
+ * @vid: CTAG VLAN ID (inner VLAN)
+ * @slan_vid: STAG VLAN ID (outer VLAN)
+ * @flex_field4_value: Flexible field 4 match value
+ * @flex_field4_mask_range: Flexible field 4 mask or range
+ * @flex_field3_value: Flexible field 3 match value
+ * @flex_field3_mask_range: Flexible field 3 mask or range
+ * @flex_field1_value: Flexible field 1 match value
+ * @flex_field1_mask_range: Flexible field 1 mask or range
+ * @outer_vid_range: Outer VLAN ID range
+ * @payload1: Payload-1 value (16-bit)
+ * @payload1_mask: Payload-1 bit mask
+ * @payload2: Payload-2 value (16-bit)
+ * @payload2_mask: Payload-2 bit mask
+ * @parser_flag_lsb: Parser flag LSW value (bits 15:0)
+ * @parser_flag_lsb_mask: Parser flag LSW mask (1 = masked out)
+ * @parser_flag_msb: Parser flag MSW value (bits 31:16)
+ * @parser_flag_msb_mask: Parser flag MSW mask (1 = masked out)
+ * @parser_flag1_lsb: Parser flag1 LSW value (bits 47:32)
+ * @parser_flag1_lsb_mask: Parser flag1 LSW mask
+ * @parser_flag1_msb: Parser flag1 MSW value (bits 63:48)
+ * @parser_flag1_msb_mask: Parser flag1 MSW mask
+ * @app_data_lsb: LSB application field (next 2 bytes after @app_data_msb,
+ *                typically TCP/UDP destination port)
+ * @app_mask_range_lsb: LSB application mask or range value
+ * @insertion_flag: CPU-inserted packet flag
+ * @vid_range: CTAG VLAN ID range (used as mask when @vid_range_select is 0)
+ * @flex_field2_mask_range: Flexible field 2 mask or range
+ * @flex_field2_value: Flexible field 2 match value
+ * @port_id: Ingress port ID for classification
+ * @dscp: Outer DSCP value
+ * @inner_dscp: Inner DSCP value
+ * @pcp: CTAG VLAN PCP (bits 2:0) and DEI (bit 3)
+ * @stag_pcp_dei: STAG VLAN PCP (bits 2:0) and DEI (bit 3)
+ * @mac_dst: Destination MAC address
+ * @mac_src: Source MAC address
+ * @protocol: Outer IP protocol value
+ * @protocol_mask: Outer IP protocol nibble mask
+ * @inner_protocol: Inner IP protocol value
+ * @inner_protocol_mask: Inner IP protocol bit mask
+ * @flex_field4_parser_index: Flexible field 4 parser output index (0..127)
+ * @flex_field3_parser_index: Flexible field 3 parser output index (0..127)
+ * @flex_field1_parser_index: Flexible field 1 parser output index (0..127)
+ * @flex_field2_parser_index: Flexible field 2 parser output index (0..127)
+ * @enable: Rule is enabled (used) or disabled (unused)
+ * @port_id_enable: Enable ingress port ID matching
+ * @port_id_exclude: Exclude (negate) port ID match
+ * @sub_if_id_type: Sub-interface ID field mode selector
+ * @sub_if_id_enable: Enable sub-interface ID matching
+ * @sub_if_id_exclude: Exclude sub-interface ID match
+ * @dscp_enable: Enable outer DSCP matching
+ * @dscp_exclude: Exclude outer DSCP match
+ * @inner_dscp_enable: Enable inner DSCP matching
+ * @inner_dscp_exclude: Exclude inner DSCP match
+ * @pcp_enable: Enable CTAG PCP/DEI matching
+ * @ctag_pcp_dei_exclude: Exclude CTAG PCP/DEI match
+ * @stag_pcp_dei_enable: Enable STAG PCP/DEI matching
+ * @stag_pcp_dei_exclude: Exclude STAG PCP/DEI match
+ * @pkt_lng_enable: Enable packet length matching
+ * @pkt_lng_exclude: Exclude packet length match
+ * @mac_dst_enable: Enable destination MAC matching
+ * @dst_mac_exclude: Exclude destination MAC match
+ * @mac_src_enable: Enable source MAC matching
+ * @src_mac_exclude: Exclude source MAC match
+ * @app_data_msb_enable: Enable MSB application field matching
+ * @app_mask_range_msb_select: MSB application mask/range selection
+ *                             (0 = nibble mask, 1 = range)
+ * @app_msb_exclude: Exclude MSB application match
+ * @app_data_lsb_enable: Enable LSB application field matching
+ * @app_mask_range_lsb_select: LSB application mask/range selection
+ *                             (0 = nibble mask, 1 = range)
+ * @app_lsb_exclude: Exclude LSB application match
+ * @dst_ip_select: Outer destination IP selection
+ *                 (0 = disabled, 1 = IPv4, 2 = IPv6)
+ * @dst_ip: Outer destination IP address
+ * @dst_ip_exclude: Exclude outer destination IP match
+ * @inner_dst_ip_select: Inner destination IP selection
+ * @inner_dst_ip: Inner destination IP address
+ * @inner_dst_ip_exclude: Exclude inner destination IP match
+ * @src_ip_select: Outer source IP selection
+ *                 (0 = disabled, 1 = IPv4, 2 = IPv6)
+ * @src_ip: Outer source IP address
+ * @src_ip_exclude: Exclude outer source IP match
+ * @inner_src_ip_select: Inner source IP selection
+ * @inner_src_ip: Inner source IP address
+ * @inner_src_ip_exclude: Exclude inner source IP match
+ * @ether_type_enable: Enable EtherType matching
+ * @ether_type_exclude: Exclude EtherType match
+ * @protocol_enable: Enable outer IP protocol matching
+ * @protocol_exclude: Exclude outer IP protocol match
+ * @inner_protocol_enable: Enable inner IP protocol matching
+ * @inner_protocol_exclude: Exclude inner IP protocol match
+ * @session_id_enable: Enable PPPoE session ID matching
+ * @session_id_exclude: Exclude PPPoE session ID match
+ * @ppp_protocol_enable: Enable PPP protocol matching
+ * @ppp_protocol_exclude: Exclude PPP protocol match
+ * @vid_used: Enable CTAG VLAN ID matching
+ * @vid_range_select: CVLAN mask/range selection (0 = mask, 1 = range)
+ * @vid_exclude: Exclude CTAG VLAN ID match
+ * @vid_original: Use original VLAN ID as key even if modified earlier
+ * @slan_vid_used: Enable STAG VLAN ID matching
+ * @slan_vid_exclude: Exclude STAG VLAN ID match
+ * @svid_range_select: SVLAN mask/range selection (0 = mask, 1 = range)
+ * @outer_vid_original: Use original outer VLAN ID as key even if modified
+ * @payload1_src_enable: Enable payload-1 matching
+ * @payload1_mask_range_select: Payload-1 mask/range selection
+ *                              (0 = bit mask, 1 = range)
+ * @payload1_exclude: Exclude payload-1 match
+ * @payload2_src_enable: Enable payload-2 matching
+ * @payload2_mask_range_select: Payload-2 mask/range selection
+ *                              (0 = bit mask, 1 = range)
+ * @payload2_exclude: Exclude payload-2 match
+ * @parser_flag_lsb_enable: Enable parser flag LSW matching
+ * @parser_flag_lsb_exclude: Exclude parser flag LSW match
+ * @parser_flag_msb_enable: Enable parser flag MSW matching
+ * @parser_flag_msb_exclude: Exclude parser flag MSW match
+ * @parser_flag1_lsb_enable: Enable parser flag1 LSW matching
+ * @parser_flag1_lsb_exclude: Exclude parser flag1 LSW match
+ * @parser_flag1_msb_enable: Enable parser flag1 MSW matching
+ * @parser_flag1_msb_exclude: Exclude parser flag1 MSW match
+ * @insertion_flag_enable: Enable insertion flag matching
+ * @flex_field4_enable: Enable flexible field 4 matching
+ * @flex_field4_exclude_enable: Exclude flexible field 4 match
+ * @flex_field4_range_enable: Flexible field 4 range mode
+ *                            (0 = mask, 1 = range)
+ * @flex_field3_enable: Enable flexible field 3 matching
+ * @flex_field3_exclude_enable: Exclude flexible field 3 match
+ * @flex_field3_range_enable: Flexible field 3 range mode
+ * @flex_field2_enable: Enable flexible field 2 matching
+ * @flex_field2_exclude_enable: Exclude flexible field 2 match
+ * @flex_field2_range_enable: Flexible field 2 range mode
+ * @flex_field1_enable: Enable flexible field 1 matching
+ * @flex_field1_exclude_enable: Exclude flexible field 1 match
+ * @flex_field1_range_enable: Flexible field 1 range mode
+ */
+struct mxl862xx_pce_pattern {
+	__le16 index;
+	__le32 dst_ip_mask;
+	__le32 inner_dst_ip_mask;
+	__le32 src_ip_mask;
+	__le32 inner_src_ip_mask;
+	__le16 sub_if_id;
+	__le16 pkt_lng;
+	__le16 pkt_lng_range;
+	__le16 mac_dst_mask;
+	__le16 mac_src_mask;
+	__le16 app_data_msb;
+	__le16 app_mask_range_msb;
+	__le16 ether_type;
+	__le16 ether_type_mask;
+	__le16 session_id;
+	__le16 ppp_protocol;
+	__le16 ppp_protocol_mask;
+	__le16 vid;
+	__le16 slan_vid;
+	__le16 flex_field4_value;
+	__le16 flex_field4_mask_range;
+	__le16 flex_field3_value;
+	__le16 flex_field3_mask_range;
+	__le16 flex_field1_value;
+	__le16 flex_field1_mask_range;
+	__le16 outer_vid_range;
+	__le16 payload1;
+	__le16 payload1_mask;
+	__le16 payload2;
+	__le16 payload2_mask;
+	__le16 parser_flag_lsb;
+	__le16 parser_flag_lsb_mask;
+	__le16 parser_flag_msb;
+	__le16 parser_flag_msb_mask;
+	__le16 parser_flag1_lsb;
+	__le16 parser_flag1_lsb_mask;
+	__le16 parser_flag1_msb;
+	__le16 parser_flag1_msb_mask;
+	__le16 app_data_lsb;
+	__le16 app_mask_range_lsb;
+	__le16 insertion_flag;
+	__le16 vid_range;
+	__le16 flex_field2_mask_range;
+	__le16 flex_field2_value;
+	u8 port_id;
+	u8 dscp;
+	u8 inner_dscp;
+	u8 pcp;
+	u8 stag_pcp_dei;
+	u8 mac_dst[ETH_ALEN];
+	u8 mac_src[ETH_ALEN];
+	u8 protocol;
+	u8 protocol_mask;
+	u8 inner_protocol;
+	u8 inner_protocol_mask;
+	u8 flex_field4_parser_index;
+	u8 flex_field3_parser_index;
+	u8 flex_field1_parser_index;
+	u8 flex_field2_parser_index;
+	u8 enable;
+	u8 port_id_enable;
+	u8 port_id_exclude;
+	__le32 sub_if_id_type;
+	u8 sub_if_id_enable;
+	u8 sub_if_id_exclude;
+	u8 dscp_enable;
+	u8 dscp_exclude;
+	u8 inner_dscp_enable;
+	u8 inner_dscp_exclude;
+	u8 pcp_enable;
+	u8 ctag_pcp_dei_exclude;
+	u8 stag_pcp_dei_enable;
+	u8 stag_pcp_dei_exclude;
+	u8 pkt_lng_enable;
+	u8 pkt_lng_exclude;
+	u8 mac_dst_enable;
+	u8 dst_mac_exclude;
+	u8 mac_src_enable;
+	u8 src_mac_exclude;
+	u8 app_data_msb_enable;
+	u8 app_mask_range_msb_select;
+	u8 app_msb_exclude;
+	u8 app_data_lsb_enable;
+	u8 app_mask_range_lsb_select;
+	u8 app_lsb_exclude;
+	__le32 dst_ip_select;
+	union mxl862xx_ip dst_ip;
+	u8 dst_ip_exclude;
+	__le32 inner_dst_ip_select;
+	union mxl862xx_ip inner_dst_ip;
+	u8 inner_dst_ip_exclude;
+	__le32 src_ip_select;
+	union mxl862xx_ip src_ip;
+	u8 src_ip_exclude;
+	__le32 inner_src_ip_select;
+	union mxl862xx_ip inner_src_ip;
+	u8 inner_src_ip_exclude;
+	u8 ether_type_enable;
+	u8 ether_type_exclude;
+	u8 protocol_enable;
+	u8 protocol_exclude;
+	u8 inner_protocol_enable;
+	u8 inner_protocol_exclude;
+	u8 session_id_enable;
+	u8 session_id_exclude;
+	u8 ppp_protocol_enable;
+	u8 ppp_protocol_exclude;
+	u8 vid_used;
+	u8 vid_range_select;
+	u8 vid_exclude;
+	u8 vid_original;
+	u8 slan_vid_used;
+	u8 slan_vid_exclude;
+	u8 svid_range_select;
+	u8 outer_vid_original;
+	u8 payload1_src_enable;
+	u8 payload1_mask_range_select;
+	u8 payload1_exclude;
+	u8 payload2_src_enable;
+	u8 payload2_mask_range_select;
+	u8 payload2_exclude;
+	u8 parser_flag_lsb_enable;
+	u8 parser_flag_lsb_exclude;
+	u8 parser_flag_msb_enable;
+	u8 parser_flag_msb_exclude;
+	u8 parser_flag1_lsb_enable;
+	u8 parser_flag1_lsb_exclude;
+	u8 parser_flag1_msb_enable;
+	u8 parser_flag1_msb_exclude;
+	u8 insertion_flag_enable;
+	u8 flex_field4_enable;
+	u8 flex_field4_exclude_enable;
+	u8 flex_field4_range_enable;
+	u8 flex_field3_enable;
+	u8 flex_field3_exclude_enable;
+	u8 flex_field3_range_enable;
+	u8 flex_field2_enable;
+	u8 flex_field2_exclude_enable;
+	u8 flex_field2_range_enable;
+	u8 flex_field1_enable;
+	u8 flex_field1_exclude_enable;
+	u8 flex_field1_range_enable;
+} __packed;
+
+static_assert(sizeof(struct mxl862xx_pce_pattern) == 279);
+
+/**
+ * struct mxl862xx_pce_action_pbb - Provider Backbone Bridging (Mac-in-Mac)
+ *                                  action configuration
+ *
+ * @tunnel_id_known_traffic: Tunnel template index for I-Header known traffic
+ * @tunnel_id_unknown_traffic: Tunnel template index for I-Header unknown
+ *                             traffic
+ * @process_id_known_traffic: Tunnel template index for B-TAG known traffic
+ * @process_id_unknown_traffic: Tunnel template index for B-TAG unknown
+ *                              traffic
+ * @iheader_op_mode: I-Header operation mode (0 = no change, 1 = insert,
+ *                   2 = remove, 3 = replace)
+ * @btag_op_mode: B-TAG operation mode (0 = no change, 1 = insert,
+ *               2 = remove, 3 = replace)
+ * @mac_table_macinmac_select: MAC table Mac-in-Mac selection
+ *                             (0 = outer MAC, 1 = inner MAC)
+ * @iheader_action_enable: Enable Mac-in-Mac I-Header action
+ * @tunnel_id_known_traffic_enable: Enable tunnel ID for known traffic
+ * @tunnel_id_unknown_traffic_enable: Enable tunnel ID for unknown traffic
+ * @b_dst_mac_from_mac_table_enable: Use B-DA from MAC table instead of
+ *                                   tunnel template (I-Header insertion
+ *                                   mode only)
+ * @replace_b_src_mac_enable: Replace B-SA from tunnel template
+ * @replace_b_dst_mac_enable: Replace B-DA from tunnel template
+ * @replace_i_tag_res_enable: Replace I-Tag Res from tunnel template
+ * @replace_i_tag_uac_enable: Replace I-Tag UAC from tunnel template
+ * @replace_i_tag_dei_enable: Replace I-Tag DEI from tunnel template
+ * @replace_i_tag_pcp_enable: Replace I-Tag PCP from tunnel template
+ * @replace_i_tag_sid_enable: Replace I-Tag SID from tunnel template
+ * @replace_i_tag_tpid_enable: Replace I-Tag TPID from tunnel template
+ * @btag_action_enable: Enable B-TAG action
+ * @process_id_known_traffic_enable: Enable process ID for B-TAG known
+ *                                   traffic
+ * @process_id_unknown_traffic_enable: Enable process ID for B-TAG unknown
+ *                                     traffic
+ * @replace_b_tag_dei_enable: Replace B-Tag DEI from tunnel template
+ * @replace_b_tag_pcp_enable: Replace B-Tag PCP from tunnel template
+ * @replace_b_tag_vid_enable: Replace B-Tag VID from tunnel template
+ * @replace_b_tag_tpid_enable: Replace B-Tag TPID from tunnel template
+ * @mac_table_macinmac_action_enable: Enable MAC table Mac-in-Mac action
+ */
+struct mxl862xx_pce_action_pbb {
+	u8 tunnel_id_known_traffic;
+	u8 tunnel_id_unknown_traffic;
+	u8 process_id_known_traffic;
+	u8 process_id_unknown_traffic;
+	__le32 iheader_op_mode;
+	__le32 btag_op_mode;
+	__le32 mac_table_macinmac_select;
+	u8 iheader_action_enable;
+	u8 tunnel_id_known_traffic_enable;
+	u8 tunnel_id_unknown_traffic_enable;
+	u8 b_dst_mac_from_mac_table_enable;
+	u8 replace_b_src_mac_enable;
+	u8 replace_b_dst_mac_enable;
+	u8 replace_i_tag_res_enable;
+	u8 replace_i_tag_uac_enable;
+	u8 replace_i_tag_dei_enable;
+	u8 replace_i_tag_pcp_enable;
+	u8 replace_i_tag_sid_enable;
+	u8 replace_i_tag_tpid_enable;
+	u8 btag_action_enable;
+	u8 process_id_known_traffic_enable;
+	u8 process_id_unknown_traffic_enable;
+	u8 replace_b_tag_dei_enable;
+	u8 replace_b_tag_pcp_enable;
+	u8 replace_b_tag_vid_enable;
+	u8 replace_b_tag_tpid_enable;
+	u8 mac_table_macinmac_action_enable;
+} __packed;
+
+static_assert(sizeof(struct mxl862xx_pce_action_pbb) == 36);
+
+/**
+ * struct mxl862xx_pce_action_dest_subif - Destination sub-interface ID
+ *                                         action configuration
+ *
+ * @dest_subifid_action_enable: Destination sub-interface ID group field
+ *                              action enable
+ * @dest_subifid_assignment_enable: Destination sub-interface ID group field
+ *                                  assignment enable
+ * @dest_subifgrp_field: Destination sub-interface ID group field value,
+ *                       or LAG index when trunking action is enabled
+ */
+struct mxl862xx_pce_action_dest_subif {
+	u8 dest_subifid_action_enable;
+	u8 dest_subifid_assignment_enable;
+	__le16 dest_subifgrp_field;
+} __packed;
+
+static_assert(sizeof(struct mxl862xx_pce_action_dest_subif) == 4);
+
+/**
+ * enum mxl862xx_pce_action_portmap - Forwarding group action selector
+ *
+ * Selects how the packet is forwarded. Mutually exclusive with
+ * the flow_id_action (bFlowID_Action in vendor API).
+ *
+ * @MXL862XX_PCE_ACTION_PORTMAP_DISABLE: Forwarding action is disabled
+ * @MXL862XX_PCE_ACTION_PORTMAP_REGULAR: Use default port-map from
+ *     forwarding classification
+ * @MXL862XX_PCE_ACTION_PORTMAP_DISCARD: Discard the packet
+ * @MXL862XX_PCE_ACTION_PORTMAP_CPU: Forward to the CPU port
+ *     (as configured by GSW_CPU_PortCfgSet, typically the on-die
+ *     microcontroller -- not the DSA CPU port)
+ * @MXL862XX_PCE_ACTION_PORTMAP_ALTERNATIVE: Forward to an explicit
+ *     portmap given by forward_port_map[]
+ */
+enum mxl862xx_pce_action_portmap {
+	MXL862XX_PCE_ACTION_PORTMAP_DISABLE		= 0,
+	MXL862XX_PCE_ACTION_PORTMAP_REGULAR		= 1,
+	MXL862XX_PCE_ACTION_PORTMAP_DISCARD		= 2,
+	MXL862XX_PCE_ACTION_PORTMAP_CPU			= 3,
+	MXL862XX_PCE_ACTION_PORTMAP_ALTERNATIVE		= 4,
+};
+
+/**
+ * enum mxl862xx_pce_action_cross_state - Cross state action selector
+ *
+ * Controls whether the packet ignores STP port-state filtering.
+ *
+ * @MXL862XX_PCE_ACTION_CROSS_STATE_DISABLE: Cross state action is disabled
+ * @MXL862XX_PCE_ACTION_CROSS_STATE_REGULAR: Enabled; packet is treated
+ *     as non-cross-state (does not ignore port-state filtering)
+ * @MXL862XX_PCE_ACTION_CROSS_STATE_CROSS: Enabled; packet ignores
+ *     port-state filtering rules (e.g. passes through BLOCKING state)
+ */
+enum mxl862xx_pce_action_cross_state {
+	MXL862XX_PCE_ACTION_CROSS_STATE_DISABLE		= 0,
+	MXL862XX_PCE_ACTION_CROSS_STATE_REGULAR		= 1,
+	MXL862XX_PCE_ACTION_CROSS_STATE_CROSS		= 2,
+};
+
+/**
+ * struct mxl862xx_pce_action - PCE rule action configuration
+ *
+ * Defines the actions applied to packets matching a PCE rule pattern.
+ *
+ * @time_comp: Signed time compensation value for OAM delay measurement
+ * @extended_vlan_block_id: Extended VLAN block allocated for this flow
+ *                          entry (valid when @extended_vlan_enable is set)
+ * @ins_ext_point: Insertion/extraction point
+ * @ptp_seq_id: PTP sequence ID for PTP application
+ * @pkt_update_offset: Byte offset (2..255) for counter/timestamp
+ *                     insertion (used when @no_pkt_update and
+ *                     @append_to_pkt are both false)
+ * @oam_flow_id: Traffic flow counter ID for OAM loss measurement
+ * @record_id: Record ID used by extraction and/or OAM process
+ * @forward_port_map: Target portmap for forwarded packets. Each bit
+ *                    represents one bridge port. Used when
+ *                    @port_map_action is %MXL862XX_PCE_ACTION_PORTMAP_ALTERNATIVE.
+ * @rmon_id: RMON counter ID (index starts from zero)
+ * @svlan_id: Alternative STAG VLAN ID
+ * @flow_id: Flow ID
+ * @rout_ext_id: Routing extension ID value (8-bit range)
+ * @traffic_class_alternate: Alternative traffic class (used when
+ *                           @traffic_class_action selects alternate)
+ * @meter_id: Meter ID
+ * @vlan_id: Alternative CTAG VLAN ID
+ * @fid: Alternative Filtering Identifier (FID)
+ * @traffic_class_action: Traffic class action selector
+ *                        (0 = disable, 1 = regular CoS, 2 = alternative)
+ * @snooping_type_action: IGMP snooping control selector
+ * @learning_action: MAC learning action selector
+ *                   (0 = disable, 1 = regular, 2 = force no learn,
+ *                   3 = force learn)
+ * @irq_action: Interrupt action selector
+ *              (0 = disable, 1 = regular, 2 = generate interrupt)
+ * @cross_state_action: Cross state action selector.
+ *     See &enum mxl862xx_pce_action_cross_state
+ * @crit_frame_action: Critical frame action selector
+ *                     (0 = disable, 1 = regular, 2 = critical)
+ * @color_frame_action: Color frame action selector (replaces
+ *                      @crit_frame_action in GSWIP-3.1)
+ * @timestamp_action: Timestamp action selector
+ *                    (0 = disable, 1 = regular, 2 = store timestamps)
+ * @port_map_action: Forwarding portmap action selector.
+ *     See &enum mxl862xx_pce_action_portmap
+ * @meter_action: Meter action selector
+ *                (0 = disable, 1 = regular, 2 = meter 1,
+ *                3 = meter 1 and 2)
+ * @vlan_action: CTAG VLAN action selector
+ *              (0 = disable, 1 = regular, 2 = alternative)
+ * @svlan_action: STAG VLAN action selector
+ *               (0 = disable, 1 = regular, 2 = alternative)
+ * @vlan_cross_action: Cross-VLAN action selector
+ *                     (0 = disable, 1 = regular, 2 = cross-VLAN)
+ * @process_path_action: MPE processing path assignment
+ *                       (0 = unused, 1 = path-1, 2 = path-2, 3 = both)
+ * @port_filter_type_action: Port filter action type (0..6)
+ * @pbb_action: Provider Backbone Bridging (Mac-in-Mac) action.
+ *     See &struct mxl862xx_pce_action_pbb
+ * @dest_subif_action: Destination sub-interface ID action.
+ *     See &struct mxl862xx_pce_action_dest_subif
+ * @remark_action: Enable remarking action
+ * @remark_pcp: Enable CTAG VLAN PCP remarking
+ * @remark_stag_pcp: Enable STAG VLAN PCP remarking
+ * @remark_stag_dei: Enable STAG VLAN DEI remarking
+ * @remark_dscp: Enable DSCP remarking
+ * @remark_class: Enable class remarking
+ * @rmon_action: Enable RMON counter action
+ * @fid_enable: Enable alternative FID
+ * @extended_vlan_enable: Enable extended VLAN operation for matching
+ *                        traffic
+ * @cvlan_ignore_control: CVLAN ignore control
+ * @port_bitmap_mux_control: Port bitmap mux control
+ * @port_trunk_action: Enable trunking action
+ * @port_link_selection: Port link selection control
+ * @flow_id_action: Enable flow ID action (mutually exclusive with
+ *                  @port_map_action)
+ * @rout_ext_id_action: Enable routing extension ID action
+ * @rt_dst_port_mask_cmp_action: Routing destination port mask comparison
+ * @rt_src_port_mask_cmp_action: Routing source port mask comparison
+ * @rt_dst_ip_mask_cmp_action: Routing destination IP mask comparison
+ * @rt_src_ip_mask_cmp_action: Routing source IP mask comparison
+ * @rt_inner_ip_as_key_action: Use inner IP in tunneled header as
+ *                             routing key
+ * @rt_accel_ena_action: Routing acceleration enable
+ * @rt_ctrl_ena_action: Routing control enable (selects routing
+ *                      accelerate action)
+ * @extract_enable: Enable packet extraction at point defined by
+ *                  @record_id
+ * @oam_enable: Enable OAM processing for matching packets
+ * @pce_bypass_path: Update packet in PCE bypass path (after QoS queue)
+ * @tx_flow_cnt: Use TX flow counter (otherwise RX flow counter)
+ * @time_format: Timestamp format (0 = digital 10B, 1 = binary 10B,
+ *               2 = digital 8B, 3 = binary 8B)
+ * @no_pkt_update: Do not update packet
+ * @append_to_pkt: Append counter/timestamp to end of packet (when
+ *                 @no_pkt_update is false)
+ * @pbb_action_enable: Enable PBB action. See &struct mxl862xx_pce_action_pbb
+ * @dest_subif_action_enable: Enable destination sub-interface ID action.
+ *     See &struct mxl862xx_pce_action_dest_subif
+ */
+struct mxl862xx_pce_action {
+	__le64 time_comp;
+	__le16 extended_vlan_block_id;
+	u8 ins_ext_point;
+	u8 ptp_seq_id;
+	__le16 pkt_update_offset;
+	__le16 oam_flow_id;
+	__le16 record_id;
+	__le16 forward_port_map[8];
+	__le16 rmon_id;
+	__le16 svlan_id;
+	__le16 flow_id;
+	__le16 rout_ext_id;
+	u8 traffic_class_alternate;
+	u8 meter_id;
+	u8 vlan_id;
+	u8 fid;
+	__le32 traffic_class_action;
+	__le32 snooping_type_action;
+	__le32 learning_action;
+	__le32 irq_action;
+	__le32 cross_state_action;
+	__le32 crit_frame_action;
+	__le32 color_frame_action;
+	__le32 timestamp_action;
+	__le32 port_map_action;
+	__le32 meter_action;
+	__le32 vlan_action;
+	__le32 svlan_action;
+	__le32 vlan_cross_action;
+	__le32 process_path_action;
+	__le32 port_filter_type_action;
+	struct mxl862xx_pce_action_pbb pbb_action;
+	struct mxl862xx_pce_action_dest_subif dest_subif_action;
+	u8 remark_action;
+	u8 remark_pcp;
+	u8 remark_stag_pcp;
+	u8 remark_stag_dei;
+	u8 remark_dscp;
+	u8 remark_class;
+	u8 rmon_action;
+	u8 fid_enable;
+	u8 extended_vlan_enable;
+	u8 cvlan_ignore_control;
+	u8 port_bitmap_mux_control;
+	u8 port_trunk_action;
+	u8 port_link_selection;
+	u8 flow_id_action;
+	u8 rout_ext_id_action;
+	u8 rt_dst_port_mask_cmp_action;
+	u8 rt_src_port_mask_cmp_action;
+	u8 rt_dst_ip_mask_cmp_action;
+	u8 rt_src_ip_mask_cmp_action;
+	u8 rt_inner_ip_as_key_action;
+	u8 rt_accel_ena_action;
+	u8 rt_ctrl_ena_action;
+	u8 extract_enable;
+	u8 oam_enable;
+	u8 pce_bypass_path;
+	u8 tx_flow_cnt;
+	__le32 time_format;
+	u8 no_pkt_update;
+	u8 append_to_pkt;
+	u8 pbb_action_enable;
+	u8 dest_subif_action_enable;
+} __packed;
+
+static_assert(sizeof(struct mxl862xx_pce_action) == 180);
+
+/**
+ * enum mxl862xx_pce_rule_region - PCE rule table region selector
+ *
+ * Selects which region of the traffic flow table the rule belongs to.
+ *
+ * @MXL862XX_PCE_RULE_COMMON: Common region shared by all CTPs
+ *     (global rules, indices 0..63)
+ * @MXL862XX_PCE_RULE_CTP: Per-CTP region. The rule index is relative
+ *     to the CTP block identified by logicalportid; the firmware
+ *     translates it to an absolute hardware index.
+ * @MXL862XX_PCE_RULE_DEBUG: Debug region with direct HW index mapping
+ */
+enum mxl862xx_pce_rule_region {
+	MXL862XX_PCE_RULE_COMMON	= 0,
+	MXL862XX_PCE_RULE_CTP		= 1,
+	MXL862XX_PCE_RULE_DEBUG		= 2,
+};
+
+/**
+ * struct mxl862xx_pce_rule - PCE rule configuration
+ * @logicalportid: Logical Port Id
+ * @subifidgroup: Sub-interface ID group
+ * @region: PCE rule region (common or per-CTP)
+ * @pattern: Match pattern (destination MAC, EtherType, etc.)
+ * @action: Forwarding action (portmap, cross-state, etc.)
+ *
+ * This structure is passed to the firmware via the MDIO data
+ * buffer using the %MXL862XX_TFLOW_PCERULEWRITE command.
+ * The binary layout must exactly match the firmware's
+ * GSW_PCE_rule_t (466 bytes, packed, little-endian scalars).
+ */
+struct mxl862xx_pce_rule {
+	u8 logicalportid;
+	__le16 subifidgroup;
+	__le32 region;
+	struct mxl862xx_pce_pattern pattern;
+	struct mxl862xx_pce_action action;
+} __packed;
+
+static_assert(sizeof(struct mxl862xx_pce_rule) == 466);
+
+/**
+ * struct mxl862xx_pce_rule_alloc - PCE rule block allocation
+ * @num_of_rules: Number of rules to allocate (input) / allocated (output).
+ *   The firmware rounds up to a multiple of four consecutive entries.
+ * @blockid: Starting rule index of the allocated block (output on alloc,
+ *   input on free).
+ *
+ * Used with %MXL862XX_TFLOW_PCERULEALLOC and %MXL862XX_TFLOW_PCERULEFREE.
+ * Maps to the firmware's ``GSW_PCE_rule_alloc_t``.
+ */
+struct mxl862xx_pce_rule_alloc {
+	__le16 num_of_rules;
+	__le16 blockid;
+} __packed;
+
+static_assert(sizeof(struct mxl862xx_pce_rule_alloc) == 4);
+
+/**
  * enum mxl862xx_stp_port_state - Spanning Tree Protocol port states
  * @MXL862XX_STP_PORT_STATE_FORWARD: Forwarding state
  * @MXL862XX_STP_PORT_STATE_DISABLE: Disabled/Discarding state
